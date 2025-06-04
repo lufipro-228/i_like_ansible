@@ -18,4 +18,30 @@ collect_info
         dest: /root/PC-INFO/{{ ansible_hostname }}.yml
         flat: yes
 
-![image](https://github.com/user-attachments/assets/96cb4794-f76f-432e-8405-85961f2989bb)
+br-srv /root/
+# how-to-get-cisco-routers-config-with-ansible
+ - name: getting info about network
+   hosts: hq-rtr, br-rtr
+   gather_facts: no
+   tasks:
+    - name: getting command sho run
+      ios_command:
+        commands: show running-config
+      register: config
+    - name: saving config into a new file on server
+      copy:
+        content: "{{ config.stdout[0] }}"
+        dest: "/root/NETWORK_INFO/{{ inventory_hostname }}.backup"
+
+----- br-srv
+[srv]
+hq-srv ansible_ssh_user=sshuser ansible_port=2025
+br-srv ansible_ssh_user=sshuser ansible_port=2025
+[routers]
+hq-rtr ansible_user=net_admin ansible_password=P@ssw0rd ansible_connection=network_cli ansible_network_os=ios
+br-rtr ansible_user=net_admin ansible_password=P@ssw0rd ansible_connection=network_cli ansible_network_os=ios
+[cli]
+hq-cli ansible_ssh_user=student
+
+[defaults]
+interpreter_python = /usr/bin/python3
